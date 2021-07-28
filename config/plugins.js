@@ -8,9 +8,18 @@ module.exports = ({ env }) => ({
       api_secret: env('CLOUDINARY_SECRET'),
     },
     actionOptions: {
-      upload: {},
+      upload: {
+				format: "jpg"
+			},
       delete: {},
     },
-  },
+		breakpoints: {
+			xlarge: 1920,
+			large: 1000,
+			medium: 750,
+			small: 500,
+			xsmall: 64
+		},
+  },	
   // ...
 });
