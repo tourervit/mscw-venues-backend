@@ -11,11 +11,18 @@ module.exports = {
 		if( !user) {
 			return ctx.response.badRequest(null, [{message: [{id: "Not authorized - no authorization header"}]}])
 		}
-		const data = await strapi.services.events.find({user: user.id})
-		if (!data) {
+		let entities;
+    if (ctx.query._q) {
+      entities = await strapi.services.events.search({user: user.id, ...ctx.query });
+    } else {
+      entities = await strapi.services.events.find({user: user.id, ...ctx.query });
+    }
+
+		
+		if (!entities) {
 			return ctx.response.notFound()
 		}
-		return sanitizeEntity(data, {model: strapi.models.events})
+		return sanitizeEntity(entities, {model: strapi.models.events})
 	},
 
 	async create(ctx) {
