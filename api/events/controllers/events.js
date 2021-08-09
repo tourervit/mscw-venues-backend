@@ -37,4 +37,45 @@ module.exports = {
     }
     return sanitizeEntity(entity, { model: strapi.models.events });
   },
+	
+	async update(ctx) {
+    const { id } = ctx.params;
+    let entity;
+    const [events] = await strapi.services.events.find({
+      id: ctx.params.id,
+      'user.id': ctx.state.user.id,
+    });
+
+    if (!events) {
+      return ctx.unauthorized(`This event doesn't belong to you`);
+    }
+
+    if (ctx.is('multipart')) {
+      const { data, files } = parseMultipartData(ctx);
+      entity = await strapi.services.events.update({ id }, data, {
+        files,
+      });
+    } else {
+      entity = await strapi.services.events.update({ id }, ctx.request.body);
+    }
+
+    return sanitizeEntity(entity, { model: strapi.models.events });
+  },
+	
+	async delete(ctx) {
+    const { id } = ctx.params;
+
+    const [events] = await strapi.services.events.find({
+      id: ctx.params.id,
+      'user.id': ctx.state.user.id,
+    });
+
+    if (!events) {
+      return ctx.unauthorized(`This event doesn't belong to you`);
+    }
+
+		const entity = await strapi.services.events.delete({ id });
+
+    return sanitizeEntity(entity, { model: strapi.models.events });
+  }
 };
